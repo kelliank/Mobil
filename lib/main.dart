@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
 
 class FutureBuilderExample extends StatefulWidget {
   const FutureBuilderExample({Key? key}) : super(key: key);
-  final String title = "ToDo Page";
+  final String title = "TP 2";
 
 
   @override
@@ -35,7 +35,10 @@ class _FutureBuilderExampleState extends State<FutureBuilderExample> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
+        title: Text(
+        widget.title,
+        style: TextStyle(color: Colors.black), 
+      ),
       ),
       body: FutureBuilder<List<Todo>>(
   future: DatabaseHelper.instance.getAllTodos(),
@@ -76,6 +79,9 @@ class _FutureBuilderExampleState extends State<FutureBuilderExample> {
               onPressed: () {
                 _deleteSelectedTodos(todos);
               },
+              style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+            ),
               child: Text('Supprimer'),
             ),
             ElevatedButton(
