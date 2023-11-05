@@ -12,4 +12,5 @@ class Todo with _$Todo {
   }) = _Todo;
 
   factory Todo.fromJson(Map<String, dynamic> json) => _$TodoFromJson(json);
+
 }

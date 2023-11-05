@@ -1,42 +1,34 @@
 import 'package:flutter/material.dart';
+import 'package:todo_app_sqlite_freezed/models/DatabaseHelper.dart';
+import 'package:todo_app_sqlite_freezed/models/todo_model.dart';
 
-void main() {
+void main(){
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({Key? key}) : super(key: key);
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+    return const MaterialApp(
+      home: FutureBuilderExample(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-  final String title;
+class FutureBuilderExample extends StatefulWidget {
+  const FutureBuilderExample({Key? key}) : super(key: key);
+  final String title = "ToDo Page";
+
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<FutureBuilderExample> createState() => _FutureBuilderExampleState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
+class _FutureBuilderExampleState extends State<FutureBuilderExample> {
+  
+  final TextEditingController _taskController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -45,25 +37,110 @@ class _MyHomePageState extends State<MyHomePage> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
+      body: FutureBuilder<List<Todo>>(
+  future: DatabaseHelper.instance.getAllTodos(),
+  builder: (context, snapshot) {
+    if (snapshot.connectionState == ConnectionState.waiting) {
+      return CircularProgressIndicator();
+    }
+
+    if (snapshot.hasError) {
+      return Text('Erreur : ${snapshot.error}');
+    }
+
+    List<Todo> todos = snapshot.data ?? [];
+    return Column(
+      children: [
+        Expanded(
+          child: ListView.builder(
+            itemCount: todos.length,
+            itemBuilder: (context, index) {
+              Todo todo = todos[index];
+              return CheckboxListTile(
+              title: Text(todo.task),
+              value: todo.isCompleted,
+              onChanged: (bool? value) {
+                final updatedTodo = todo.copyWith(isCompleted: value ?? false);
+                setState(() {
+                  DatabaseHelper.instance.update(updatedTodo);
+                });
+              },
+            );
+            },
+          ),
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+                       ElevatedButton(
+              onPressed: () {
+                _deleteSelectedTodos(todos);
+              },
+              child: Text('Supprimer'),
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
+            ElevatedButton(
+          onPressed: () {
+            _showAddTaskDialog(context);
+          },
+          child: Text('Ajouter'),
+        ),
           ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      ],
+    );
+  },
+),
     );
   }
+
+void _showAddTaskDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Ajouter une tâche'),
+          content: TextField(
+            controller: _taskController,
+            decoration: InputDecoration(labelText: 'Nom de la tâche'),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Annuler'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Ajouter'),
+              onPressed: () {
+                String task = _taskController.text;
+                if (task.isNotEmpty) {
+                  DatabaseHelper.instance.insert(Todo(task: task, isCompleted: false));
+                  setState(() {});
+                  Navigator.of(context).pop();
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _deleteSelectedTodos(List<Todo> todos) {
+  final completedTodos = todos.where((todo) => todo.isCompleted).toList();
+  for (var todo in completedTodos) {
+    DatabaseHelper.instance.delete(todo.id!);
+  }
+  
+  setState(() {
+    todos.removeWhere((todo) => todo.isCompleted);
+  });
+}
+
+
+
+
+
+
 }
