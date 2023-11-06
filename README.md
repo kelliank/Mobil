@@ -1,16 +1,31 @@
-# todo_app_sqlite_freezed
+# TP2
 
-A new Flutter project.
+Kellian KAUFFMANN
 
-## Getting Started
+Ce projet est une application de gestion de tâches réalisée en utilisant Flutter et une base de données SQLite pour stocker les tâches.
 
-This project is a starting point for a Flutter application.
+## Fonctionnalités
 
-A few resources to get you started if this is your first Flutter project:
+- Ajouter une tâche (pop up)
+- Marquer une tâche comme complétée (checkbox)
+- Modifier le nom d'une tâche (pop up by sliding)
+- Supprimer des tâches (checkox + button)
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Installation
+
+1. Clonez le dépôt GitHub : https://github.com/kelliank/Mobil.git
+
+
+2. Ouvrez le projet avec un éditeur de code et lancé le avec une VM ou directement sur votre téléphone.
+
+
+## Technologies Utilisées
+
+- Flutter
+- SQLite
+
+
+
+
+
